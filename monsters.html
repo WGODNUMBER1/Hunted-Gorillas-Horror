@@ -8,6 +8,13 @@
             font-family: Consolas, monospace;
             background: #05060a;
             color: #f5f5f5;
+            opacity: 0;
+            animation: pageFade 1.5s forwards;
+        }
+
+        @keyframes pageFade {
+            from { opacity: 0; }
+            to { opacity: 1; }
         }
 
         .grid-bg {
@@ -42,6 +49,7 @@
         nav a:hover {
             color: #00c8ff;
             letter-spacing: 2px;
+            text-shadow: 0 0 8px #00c8ff;
         }
 
         .main {
@@ -70,14 +78,36 @@
             margin-bottom: 24px;
             border-radius: 6px;
             max-width: 600px;
+            transition: 0.3s;
         }
 
+        .monster-card:hover {
+            border-color: #00c8ff;
+            box-shadow: 0 0 12px #00c8ff;
+            transform: scale(1.02);
+        }
+
+        /* TYPING ANIMATION FOR MONSTER NAMES */
         .monster-name {
             font-size: 20px;
             font-weight: 700;
             letter-spacing: 2px;
             margin-bottom: 8px;
             color: #00c8ff;
+            white-space: nowrap;
+            overflow: hidden;
+            border-right: 2px solid #00c8ff;
+            width: 0;
+            animation: typing 2s steps(20) forwards, blink 0.7s infinite;
+        }
+
+        @keyframes typing {
+            from { width: 0; }
+            to { width: 300px; }
+        }
+
+        @keyframes blink {
+            50% { border-color: transparent; }
         }
 
         .monster-desc {
@@ -105,11 +135,38 @@
             background: #032133;
             transform: scale(1.05);
             border-color: #00c8ff;
+            color: #a8f0ff;
+        }
+
+        /* HORROR INTRO SCREEN */
+        #intro {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #000;
+            color: #00c8ff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 32px;
+            letter-spacing: 4px;
+            z-index: 999;
+            animation: introFade 3s forwards;
+        }
+
+        @keyframes introFade {
+            0% { opacity: 1; }
+            70% { opacity: 1; }
+            100% { opacity: 0; visibility: hidden; }
         }
     </style>
 </head>
 
 <body class="grid-bg">
+
+    <div id="intro">HGH MONSTERS LOADING...</div>
 
     <header>
         <div class="logo">HGH HUB</div>
@@ -129,30 +186,36 @@
         <div class="title">HGH MONSTERS</div>
         <div class="subtitle">CREATURES THAT HUNT IN THE DARK</div>
 
-        <!-- MONSTER LIST -->
+        <!-- FOREST MONSTERS -->
         <div class="monster-card">
-            <div class="monster-name">ECHO</div>
-            <div class="monster-desc">Echo Is in the forest map and he lurks around Gorilla Tag Ghost Area</div>
+            <div class="monster-name">FOREST MONSTERS</div>
+            <div class="monster-desc">PLACEHOLDER</div>
+        </div>
+
+        <!-- PLACEHOLDER MONSTERS -->
+        <div class="monster-card">
+            <div class="monster-name">PLACEHOLDER MONSTER</div>
+            <div class="monster-desc">PLACEHOLDER</div>
         </div>
 
         <div class="monster-card">
-            <div class="monster-name">TIMMY</div>
-            <div class="monster-desc">Timmy Is in the forst map and he is the OG Classic Monster</div>
+            <div class="monster-name">PLACEHOLDER MONSTER</div>
+            <div class="monster-desc">PLACEHOLDER</div>
         </div>
 
         <div class="monster-card">
-            <div class="monster-name">GRANDPA</div>
-            <div class="monster-desc">Grandpa Is in the forest map and he is the owner of forest</div>
+            <div class="monster-name">PLACEHOLDER MONSTER</div>
+            <div class="monster-desc">PLACEHOLDER</div>
         </div>
 
         <div class="monster-card">
-            <div class="monster-name">PBBV</div>
-            <div class="monster-desc">PBBV Is in the forest map and he lurks around Gorilla Tag Ghost Area</div>
+            <div class="monster-name">PLACEHOLDER MONSTER</div>
+            <div class="monster-desc">PLACEHOLDER</div>
         </div>
 
         <div class="monster-card">
-            <div class="monster-name">J3VU</div>
-            <div class="monster-desc">J3VU Is in the forest map and he lurks around Gorilla Tag Ghost Area</div>
+            <div class="monster-name">PLACEHOLDER MONSTER</div>
+            <div class="monster-desc">PLACEHOLDER</div>
         </div>
 
         <a class="back-btn" href="index.html">RETURN TO HUB</a>
