@@ -1,182 +1,489 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Hunted Gorillas Horror Hub</title>
+    <meta charset="UTF-8">
+    <title>HGH TERMINAL</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
-        body {
+        * {
+            box-sizing: border-box;
             margin: 0;
+            padding: 0;
+        }
+
+        body {
             font-family: Consolas, monospace;
-            background: #05060a;
-            color: #f5f5f5;
+            background: #02030a;
+            color: #e5e7eb;
+            overflow: hidden;
         }
 
-        .grid-bg {
+        /* VHS scanlines */
+        .vhs-scanlines {
+            pointer-events: none;
+            position: fixed;
+            inset: 0;
+            background-image: linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px);
+            background-size: 100% 3px;
+            mix-blend-mode: screen;
+            opacity: 0.35;
+        }
+
+        /* Fog + particles */
+        .fog {
+            position: fixed;
+            inset: -20%;
+            background: radial-gradient(circle at 20% 0%, rgba(255,255,255,0.06), transparent 60%),
+                        radial-gradient(circle at 80% 100%, rgba(255,255,255,0.05), transparent 60%);
+            filter: blur(12px);
+            opacity: 0.45;
+            animation: fogMove 40s linear infinite;
+            pointer-events: none;
+        }
+
+        @keyframes fogMove {
+            0% { transform: translate3d(-20px, 0, 0); }
+            50% { transform: translate3d(20px, 10px, 0); }
+            100% { transform: translate3d(-20px, 0, 0); }
+        }
+
+        .particles {
+            position: fixed;
+            inset: 0;
             background-image:
-                linear-gradient(#111 1px, transparent 1px),
-                linear-gradient(90deg, #111 1px, transparent 1px);
+                radial-gradient(circle, rgba(255,255,255,0.12) 1px, transparent 1px),
+                radial-gradient(circle, rgba(255,255,255,0.08) 1px, transparent 1px);
+            background-size: 120px 120px, 200px 200px;
+            opacity: 0.25;
+            animation: particlesDrift 30s linear infinite;
+            pointer-events: none;
+        }
+
+        @keyframes particlesDrift {
+            0% { transform: translate3d(0,0,0); }
+            50% { transform: translate3d(-20px,10px,0); }
+            100% { transform: translate3d(0,0,0); }
+        }
+
+        /* Background grid */
+        .grid-bg {
+            position: fixed;
+            inset: 0;
+            background-image:
+                linear-gradient(#0b1120 1px, transparent 1px),
+                linear-gradient(90deg, #0b1120 1px, transparent 1px);
             background-size: 40px 40px;
+            opacity: 0.6;
+            animation: gridShift 20s linear infinite;
+            pointer-events: none;
         }
 
-        header {
-            padding: 16px 32px;
-            border-bottom: 1px solid #222;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+        @keyframes gridShift {
+            0% { transform: translate3d(0,0,0); }
+            100% { transform: translate3d(-40px,-40px,0); }
         }
 
-        .logo {
-            font-weight: 700;
+        /* Layout */
+        .shell {
+            position: relative;
+            z-index: 10;
+            display: grid;
+            grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+            height: 100vh;
+            padding: 32px 40px;
+            gap: 32px;
+        }
+
+        /* Left terminal panel */
+        .terminal-panel {
+            border: 1px solid #1f2937;
+            background: radial-gradient(circle at top left, #020617 0%, #02030a 55%, #000000 100%);
+            box-shadow: 0 0 40px rgba(0,0,0,0.8);
+            padding: 20px 24px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .terminal-header {
+            font-size: 11px;
             letter-spacing: 2px;
-            font-size: 14px;
-        }
-
-        nav a {
-            color: #ccc;
-            text-decoration: none;
-            margin-left: 16px;
-            font-size: 13px;
-            transition: 0.2s;
-        }
-
-        nav a:hover {
-            color: #00c8ff;
-            letter-spacing: 2px;
-            text-shadow: 0 0 8px #00c8ff;
-        }
-
-        .status-bar {
-            padding: 10px 32px;
-            background: #06140a;
-            border-bottom: 1px solid #13331b;
-            color: #7dff9b;
-            font-size: 13px;
-        }
-
-        .status-bar span {
-            color: #3cff6a;
-            font-weight: 700;
-        }
-
-        .main {
-            padding: 40px 32px 60px;
-        }
-
-        .prompt {
-            font-size: 13px;
-            color: #7dd3ff;
+            text-transform: uppercase;
+            color: #9ca3af;
             margin-bottom: 8px;
         }
 
-        /* TYPING ANIMATION */
-        .title {
-            font-size: 32px;
-            font-weight: 800;
-            letter-spacing: 3px;
-            margin-bottom: 4px;
-            white-space: nowrap;
+        .terminal-title {
+            font-size: 26px;
+            letter-spacing: 4px;
+            font-weight: 700;
+            color: #38bdf8;
+            text-shadow: 0 0 12px rgba(56,189,248,0.9);
+        }
+
+        .terminal-log {
+            margin-top: 16px;
+            font-size: 12px;
+            line-height: 1.5;
+            color: #d1d5db;
+            max-height: 60vh;
             overflow: hidden;
-            border-right: 2px solid #00c8ff;
-            width: 0;
-            animation: typing 3s steps(30) forwards, blink 0.7s infinite;
         }
 
-        @keyframes typing {
-            from { width: 0; }
-            to { width: 420px; }
+        .log-line {
+            opacity: 0;
+            transform: translateY(4px);
+            animation: logReveal 0.4s forwards;
         }
 
-        @keyframes blink {
-            50% { border-color: transparent; }
+        @keyframes logReveal {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
-        .subtitle {
-            font-size: 14px;
-            color: #9ca3af;
+        .cursor {
+            display: inline-block;
+            width: 8px;
+            height: 14px;
+            background: #38bdf8;
+            margin-left: 4px;
+            animation: cursorBlink 0.9s steps(1) infinite;
+        }
+
+        @keyframes cursorBlink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0; }
+        }
+
+        /* Glitch overlay */
+        .glitch-overlay {
+            position: absolute;
+            inset: 0;
+            background:
+                repeating-linear-gradient(180deg, rgba(255,255,255,0.08) 0, rgba(255,255,255,0.08) 1px, transparent 2px),
+                repeating-linear-gradient(90deg, rgba(56,189,248,0.15) 0, transparent 2px);
+            mix-blend-mode: screen;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .glitch-active {
+            animation: glitchFlash 0.6s ease-out;
+        }
+
+        @keyframes glitchFlash {
+            0% { opacity: 0.9; transform: translate3d(0,0,0); }
+            40% { opacity: 0.4; transform: translate3d(4px,-2px,0); }
+            100% { opacity: 0; transform: translate3d(0,0,0); }
+        }
+
+        /* Right menu grid */
+        .menu-panel {
+            border: 1px solid #1f2937;
+            background: radial-gradient(circle at top right, #020617 0%, #02030a 55%, #000000 100%);
+            box-shadow: 0 0 40px rgba(0,0,0,0.8);
+            padding: 20px 24px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .menu-title {
+            font-size: 13px;
+            letter-spacing: 3px;
             text-transform: uppercase;
-            letter-spacing: 2px;
+            color: #9ca3af;
             margin-bottom: 16px;
         }
 
-        .desc {
-            font-size: 13px;
-            color: #d1d5db;
-            max-width: 520px;
-            line-height: 1.5;
-            margin-bottom: 24px;
+        .menu-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 14px;
         }
 
-        .buttons {
-            display: flex;
-            gap: 12px;
-            margin-bottom: 32px;
-        }
-
-        .btn {
-            padding: 10px 18px;
-            font-size: 12px;
-            border-radius: 4px;
+        .menu-btn {
+            position: relative;
+            padding: 14px 16px;
+            border-radius: 6px;
             border: 1px solid #1f2937;
-            background: #0b1120;
+            background: radial-gradient(circle at top, #020617 0%, #02030a 60%);
             color: #e5e7eb;
-            text-decoration: none;
+            font-size: 12px;
+            letter-spacing: 2px;
             text-transform: uppercase;
+            text-align: left;
+            cursor: pointer;
+            overflow: hidden;
+        }
+
+        .menu-btn::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at top left, rgba(56,189,248,0.25), transparent 60%);
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+
+        .menu-btn::after {
+            content: "";
+            position: absolute;
+            inset: -1px;
+            border-radius: 6px;
+            border: 1px solid rgba(56,189,248,0.6);
+            opacity: 0;
+            box-shadow: 0 0 18px rgba(56,189,248,0.7);
+            transition: opacity 0.2s;
+        }
+
+        .menu-btn span {
+            position: relative;
+            z-index: 1;
+        }
+
+        .menu-btn:hover::before,
+        .menu-btn:hover::after {
+            opacity: 1;
+        }
+
+        .menu-btn:hover {
+            color: #f9fafb;
+        }
+
+        .menu-footer {
+            font-size: 11px;
+            color: #6b7280;
             letter-spacing: 1px;
-            transition: 0.25s;
+            text-transform: uppercase;
         }
 
-        /* BUTTON ANIMATION */
-        .btn:hover {
-            background: #032133;
-            transform: scale(1.05);
-            border-color: #00c8ff;
-            color: #a8f0ff;
+        .menu-footer strong {
+            color: #38bdf8;
         }
 
+        /* Link reset */
+        a.menu-link {
+            text-decoration: none;
+            color: inherit;
+            display: block;
+        }
+
+        /* Intro overlay */
+        .intro-overlay {
+            position: fixed;
+            inset: 0;
+            background: #000000;
+            z-index: 50;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            color: #e5e7eb;
+        }
+
+        .intro-line {
+            font-size: 13px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-bottom: 6px;
+            opacity: 0;
+            transform: translateY(4px);
+            animation: introLine 0.4s forwards;
+        }
+
+        @keyframes introLine {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .intro-title {
+            margin-top: 18px;
+            font-size: 24px;
+            letter-spacing: 4px;
+            font-weight: 700;
+            color: #38bdf8;
+            text-shadow: 0 0 14px rgba(56,189,248,0.9);
+            opacity: 0;
+            transform: translateY(6px);
+            animation: introTitle 0.7s forwards;
+            animation-delay: 1.4s;
+        }
+
+        @keyframes introTitle {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .intro-static {
+            position: absolute;
+            inset: 0;
+            background:
+                radial-gradient(circle, rgba(255,255,255,0.12) 1px, transparent 1px),
+                radial-gradient(circle, rgba(255,255,255,0.08) 1px, transparent 1px);
+            background-size: 4px 4px, 2px 2px;
+            mix-blend-mode: screen;
+            opacity: 0;
+            animation: introStatic 0.7s ease-out;
+            animation-delay: 2.1s;
+        }
+
+        @keyframes introStatic {
+            0% { opacity: 0.9; }
+            100% { opacity: 0; }
+        }
+
+        .intro-overlay.hide {
+            animation: introFadeOut 0.7s ease-out forwards;
+            animation-delay: 2.4s;
+        }
+
+        @keyframes introFadeOut {
+            to {
+                opacity: 0;
+                visibility: hidden;
+            }
+        }
+
+        @media (max-width: 900px) {
+            .shell {
+                grid-template-columns: minmax(0, 1fr);
+                padding: 20px;
+            }
+            .menu-panel {
+                margin-top: 12px;
+            }
+        }
     </style>
 </head>
+<body>
+    <!-- VHS layers -->
+    <div class="grid-bg"></div>
+    <div class="fog"></div>
+    <div class="particles"></div>
+    <div class="vhs-scanlines"></div>
 
-<body class="grid-bg">
-
-    <header>
-        <div class="logo">HGH HUB</div>
-        <nav>
-            <a href="index.html">HOME</a>
-            <a href="monsters.html">MONSTERS</a>
-            <a href="#">INFO</a>
-            <a href="#">SNEAK PEAKS</a>
-            <a href="#">OST</a>
-            <a href="#">CHANGELOG</a>
-            <a href="#">STATUS</a>
-        </nav>
-    </header>
-
-    <div class="status-bar">
-        <span>[SUCCESS]</span> Site Online — Hunted Gorillas Horror hub is live.
+    <!-- Long VHS intro -->
+    <div class="intro-overlay" id="intro">
+        <div class="intro-static"></div>
+        <div class="intro-line" style="animation-delay:0.1s;">BOOTING HGH VHS SYSTEM...</div>
+        <div class="intro-line" style="animation-delay:0.4s;">LOADING TERMINAL MODULES...</div>
+        <div class="intro-line" style="animation-delay:0.7s;">INITIALIZING HORROR INTERFACE...</div>
+        <div class="intro-title">HGH TERMINAL</div>
     </div>
 
-    <main class="main">
+    <!-- Main layout -->
+    <div class="shell">
+        <!-- Left terminal -->
+        <section class="terminal-panel">
+            <div class="glitch-overlay" id="glitch"></div>
+            <div class="terminal-header">HGH SYSTEM / TERMINAL</div>
+            <div class="terminal-title" id="terminalTitle"></div>
+            <div class="terminal-log" id="terminalLog"></div>
+        </section>
 
-        <div class="prompt">
-            HGH &gt; WGODNUMBER1
-        </div>
+        <!-- Right menu -->
+        <section class="menu-panel">
+            <div>
+                <div class="menu-title">HGH MAIN HUB</div>
+                <div class="menu-grid">
+                    <a class="menu-link" href="index.html">
+                        <button class="menu-btn"><span>HOME</span></button>
+                    </a>
+                    <a class="menu-link" href="monsters.html">
+                        <button class="menu-btn"><span>MONSTERS</span></button>
+                    </a>
+                    <a class="menu-link" href="#">
+                        <button class="menu-btn"><span>INFO</span></button>
+                    </a>
+                    <a class="menu-link" href="#">
+                        <button class="menu-btn"><span>SNEAK PEAKS</span></button>
+                    </a>
+                    <a class="menu-link" href="#">
+                        <button class="menu-btn"><span>OST</span></button>
+                    </a>
+                    <a class="menu-link" href="#">
+                        <button class="menu-btn"><span>CHANGELOG</span></button>
+                    </a>
+                    <a class="menu-link" href="#">
+                        <button class="menu-btn"><span>STATUS</span></button>
+                    </a>
+                </div>
+            </div>
+            <div class="menu-footer">
+                <strong>HGH</strong> VHS HORROR SYSTEM / BUILD 0.1
+            </div>
+        </section>
+    </div>
 
-        <div class="title">HUNTED GORILLAS HORROR</div>
+    <script>
+        // Simple hover sound (optional: you can remove if you don't want it)
+        let hoverAudio;
+        try {
+            hoverAudio = new Audio("data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAESsAACJWAAACABAAZGF0YQAAAAA=");
+        } catch (e) {}
 
-        <div class="subtitle">PRIVATE HORROR GAME HUB</div>
+        document.querySelectorAll(".menu-btn").forEach(btn => {
+            btn.addEventListener("mouseenter", () => {
+                if (hoverAudio) {
+                    hoverAudio.currentTime = 0;
+                    hoverAudio.play().catch(() => {});
+                }
+            });
+        });
 
-        <div class="desc">
-            A central hub for Hunted Gorillas Horror — info, sneak peaks, OST, and more.
-            Built for players who want to follow the game as it evolves, discover secrets,
-            and stay close to the horror.
-        </div>
+        // Terminal typing + logs
+        const titleText = "HGH TERMINAL";
+        const titleEl = document.getElementById("terminalTitle");
+        const logEl = document.getElementById("terminalLog");
+        const glitchEl = document.getElementById("glitch");
+        const introEl = document.getElementById("intro");
 
-        <div class="buttons">
-            <a class="btn" href="monsters.html">BROWSE MONSTERS</a>
-            <a class="btn" href="#">FOLLOW HGH UPDATES</a>
-        </div>
+        const logs = [
+            "[SYS] VHS core online.",
+            "[SYS] Gorilla horror modules loaded.",
+            "[NET] Hub routes: HOME / MONSTERS / INFO / SNEAK PEAKS / OST / CHANGELOG / STATUS.",
+            "[SEC] Warning: entities detected in system.",
+            "[USR] Access granted. Navigate using hub grid."
+        ];
 
-    </main>
+        function typeTitle(text, cb) {
+            let i = 0;
+            const interval = setInterval(() => {
+                titleEl.textContent = text.slice(0, i);
+                i++;
+                if (i > text.length) {
+                    clearInterval(interval);
+                    cb && cb();
+                }
+            }, 80);
+        }
 
+        function showLogs() {
+            logs.forEach((line, idx) => {
+                const div = document.createElement("div");
+                div.className = "log-line";
+                div.style.animationDelay = (0.2 * idx) + "s";
+                div.textContent = line;
+                logEl.appendChild(div);
+            });
+            glitchEl.classList.add("glitch-active");
+            setTimeout(() => glitchEl.classList.remove("glitch-active"), 700);
+        }
+
+        window.addEventListener("load", () => {
+            // Hide intro after its animation
+            introEl.classList.add("hide");
+            setTimeout(() => {
+                introEl.style.display = "none";
+                typeTitle(titleText, showLogs);
+            }, 2800);
+        });
+    </script>
 </body>
 </html>
