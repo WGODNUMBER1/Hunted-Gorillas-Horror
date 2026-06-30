@@ -36,10 +36,12 @@
             text-decoration: none;
             margin-left: 16px;
             font-size: 13px;
+            transition: 0.2s;
         }
 
         nav a:hover {
             color: #00c8ff;
+            letter-spacing: 2px;
         }
 
         .status-bar {
@@ -65,11 +67,26 @@
             margin-bottom: 8px;
         }
 
+        /* TYPING ANIMATION */
         .title {
             font-size: 32px;
             font-weight: 800;
             letter-spacing: 3px;
             margin-bottom: 4px;
+            white-space: nowrap;
+            overflow: hidden;
+            border-right: 2px solid #00c8ff;
+            width: 0;
+            animation: typing 3s steps(30) forwards, blink 0.7s infinite;
+        }
+
+        @keyframes typing {
+            from { width: 0; }
+            to { width: 420px; }
+        }
+
+        @keyframes blink {
+            50% { border-color: transparent; }
         }
 
         .subtitle {
@@ -104,21 +121,17 @@
             text-decoration: none;
             text-transform: uppercase;
             letter-spacing: 1px;
+            transition: 0.25s;
         }
 
-        .btn-primary {
-            border-color: #00c8ff;
-            background: #02131f;
-            color: #e0f7ff;
-        }
-
-        .btn-primary:hover {
+        /* BUTTON ANIMATION */
+        .btn:hover {
             background: #032133;
+            transform: scale(1.05);
+            border-color: #00c8ff;
+            color: #a8f0ff;
         }
 
-        .btn-secondary:hover {
-            background: #111827;
-        }
     </style>
 </head>
 
@@ -148,6 +161,7 @@
         </div>
 
         <div class="title">HUNTED GORILLAS HORROR</div>
+
         <div class="subtitle">PRIVATE HORROR GAME HUB</div>
 
         <div class="desc">
@@ -157,8 +171,8 @@
         </div>
 
         <div class="buttons">
-            <a class="btn btn-primary" href="monsters.html">BROWSE MONSTERS</a>
-            <a class="btn btn-secondary" href="#">FOLLOW HGH UPDATES</a>
+            <a class="btn" href="monsters.html">BROWSE MONSTERS</a>
+            <a class="btn" href="#">FOLLOW HGH UPDATES</a>
         </div>
 
     </main>
