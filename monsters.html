@@ -1,129 +1,397 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
     <title>HGH Monsters</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
         body {
-            margin: 0;
             font-family: Consolas, monospace;
-            background: #05060a;
-            color: #f5f5f5;
+            background: #02030a;
+            color: #e5e7eb;
+            overflow-x: hidden;
+        }
+
+        .vhs-scanlines {
+            pointer-events: none;
+            position: fixed;
+            inset: 0;
+            background-image: linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px);
+            background-size: 100% 3px;
+            mix-blend-mode: screen;
+            opacity: 0.35;
+        }
+
+        .fog {
+            position: fixed;
+            inset: -20%;
+            background: radial-gradient(circle at 10% 0%, rgba(255,255,255,0.06), transparent 60%),
+                        radial-gradient(circle at 90% 100%, rgba(255,255,255,0.05), transparent 60%);
+            filter: blur(12px);
+            opacity: 0.45;
+            animation: fogMove 40s linear infinite;
+            pointer-events: none;
+        }
+
+        @keyframes fogMove {
+            0% { transform: translate3d(-10px, 0, 0); }
+            50% { transform: translate3d(10px, 8px, 0); }
+            100% { transform: translate3d(-10px, 0, 0); }
+        }
+
+        .particles {
+            position: fixed;
+            inset: 0;
+            background-image:
+                radial-gradient(circle, rgba(255,255,255,0.12) 1px, transparent 1px),
+                radial-gradient(circle, rgba(255,255,255,0.08) 1px, transparent 1px);
+            background-size: 120px 120px, 200px 200px;
+            opacity: 0.25;
+            animation: particlesDrift 30s linear infinite;
+            pointer-events: none;
+        }
+
+        @keyframes particlesDrift {
+            0% { transform: translate3d(0,0,0); }
+            50% { transform: translate3d(-20px,10px,0); }
+            100% { transform: translate3d(0,0,0); }
         }
 
         .grid-bg {
+            position: fixed;
+            inset: 0;
             background-image:
-                linear-gradient(#111 1px, transparent 1px),
-                linear-gradient(90deg, #111 1px, transparent 1px);
+                linear-gradient(#0b1120 1px, transparent 1px),
+                linear-gradient(90deg, #0b1120 1px, transparent 1px);
             background-size: 40px 40px;
+            opacity: 0.6;
+            animation: gridShift 20s linear infinite;
+            pointer-events: none;
+        }
+
+        @keyframes gridShift {
+            0% { transform: translate3d(0,0,0); }
+            100% { transform: translate3d(-40px,-40px,0); }
         }
 
         header {
+            position: relative;
+            z-index: 10;
             padding: 16px 32px;
-            border-bottom: 1px solid #222;
+            border-bottom: 1px solid #1f2937;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: radial-gradient(circle at top, #020617 0%, #02030a 60%);
+        }
+
+        .logo {
+            font-weight: 700;
+            letter-spacing: 3px;
+            font-size: 13px;
+            color: #38bdf8;
+            text-shadow: 0 0 10px rgba(56,189,248,0.9);
+        }
+
+        nav a {
+            color: #9ca3af;
+            text-decoration: none;
+            margin-left: 16px;
+            font-size: 12px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            position: relative;
+        }
+
+        nav a::after {
+            content: "";
+            position: absolute;
+            left: 0;
+            bottom: -3px;
+            width: 0;
+            height: 1px;
+            background: #38bdf8;
+            box-shadow: 0 0 8px rgba(56,189,248,0.8);
+            transition: width 0.2s;
+        }
+
+        nav a:hover {
+            color: #e5e7eb;
+        }
+
+        nav a:hover::after {
+            width: 100%;
+        }
+
+        main {
+            position: relative;
+            z-index: 10;
+            padding: 32px 32px 60px;
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        .title {
+            font-size: 28px;
+            font-weight: 800;
+            letter-spacing: 4px;
+            margin-bottom: 4px;
+        }
+
+        .subtitle {
+            font-size: 13px;
+            color: #9ca3af;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 20px;
+        }
+
+        .terminal-bar {
+            font-size: 11px;
+            color: #6b7280;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-bottom: 18px;
+        }
+
+        .terminal-bar span {
+            color: #38bdf8;
+        }
+
+        .layout {
+            display: grid;
+            grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
+            gap: 24px;
+        }
+
+        @media (max-width: 900px) {
+            .layout {
+                grid-template-columns: minmax(0, 1fr);
+            }
+        }
+
+        .categories {
+            border: 1px solid #1f2937;
+            border-radius: 8px;
+            background: radial-gradient(circle at top left, #020617 0%, #02030a 60%);
+            padding: 18px 18px 22px;
+            box-shadow: 0 0 30px rgba(0,0,0,0.8);
+        }
+
+        .category {
+            background: #020617;
+            border-radius: 6px;
+            border: 1px solid #1f2937;
+            padding: 12px 14px;
+            margin-bottom: 10px;
+            cursor: pointer;
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
 
-        .logo {
-            font-weight: 700;
-            letter-spacing: 2px;
-            font-size: 14px;
-        }
-
-        nav a {
-            color: #ccc;
-            text-decoration: none;
-            margin-left: 16px;
+        .category-label {
             font-size: 13px;
-        }
-
-        nav a:hover {
-            color: #00c8ff;
-        }
-
-        .main {
-            padding: 40px 32px 60px;
-        }
-
-        .title {
-            font-size: 32px;
-            font-weight: 800;
-            letter-spacing: 3px;
-            margin-bottom: 4px;
-        }
-
-        .subtitle {
-            font-size: 14px;
-            color: #9ca3af;
+            letter-spacing: 2px;
             text-transform: uppercase;
-            letter-spacing: 2px;
-            margin-bottom: 16px;
         }
 
-        .category {
-            background: #0b0d13;
-            border: 1px solid #1f2937;
-            padding: 16px;
-            margin-bottom: 12px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 18px;
-            letter-spacing: 2px;
+        .category-label span {
+            color: #38bdf8;
+        }
+
+        .category-arrow {
+            font-size: 11px;
+            color: #6b7280;
+        }
+
+        .category:hover {
+            border-color: #38bdf8;
+            box-shadow: 0 0 16px rgba(56,189,248,0.7);
         }
 
         .monster-list {
+            margin-top: 10px;
             display: none;
-            margin-top: 12px;
         }
 
         .monster-card {
-            background: #0b0d13;
-            border: 1px solid #1f2937;
-            padding: 20px;
-            margin-bottom: 16px;
             border-radius: 6px;
-            max-width: 600px;
+            border: 1px solid #1f2937;
+            background: #020617;
+            padding: 14px 14px 16px;
+            margin-bottom: 10px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .monster-card::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at top left, rgba(56,189,248,0.18), transparent 60%);
+            opacity: 0.0;
+            transition: opacity 0.2s;
+        }
+
+        .monster-card:hover::before {
+            opacity: 1;
         }
 
         .monster-name {
-            font-size: 20px;
-            font-weight: 700;
+            font-size: 15px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: #38bdf8;
+            text-shadow: 0 0 10px rgba(56,189,248,0.9);
+            margin-bottom: 4px;
+        }
+
+        .monster-tagline {
+            font-size: 11px;
+            color: #9ca3af;
+            text-transform: uppercase;
             letter-spacing: 2px;
             margin-bottom: 8px;
-            color: #00c8ff;
         }
 
         .monster-desc {
-            font-size: 13px;
+            font-size: 12px;
             color: #d1d5db;
             line-height: 1.5;
         }
 
-        .back-btn {
-            display: inline-block;
-            margin-top: 32px;
-            padding: 10px 18px;
+        .terminal-box {
+            border: 1px solid #1f2937;
+            border-radius: 8px;
+            background: radial-gradient(circle at top right, #020617 0%, #02030a 60%);
+            padding: 18px 18px 22px;
+            box-shadow: 0 0 30px rgba(0,0,0,0.8);
+        }
+
+        .terminal-title {
+            font-size: 13px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: #9ca3af;
+            margin-bottom: 10px;
+        }
+
+        .terminal-output {
             font-size: 12px;
+            color: #d1d5db;
+            min-height: 80px;
+            margin-bottom: 12px;
+        }
+
+        .terminal-input {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .terminal-prefix {
+            font-size: 12px;
+            color: #38bdf8;
+        }
+
+        .terminal-field {
+            flex: 1;
+            background: #020617;
             border-radius: 4px;
             border: 1px solid #1f2937;
-            background: #0b1120;
+            padding: 6px 8px;
+            font-size: 12px;
+            color: #e5e7eb;
+        }
+
+        .terminal-field:focus {
+            outline: none;
+            border-color: #38bdf8;
+            box-shadow: 0 0 12px rgba(56,189,248,0.7);
+        }
+
+        .terminal-hint {
+            font-size: 11px;
+            color: #6b7280;
+            margin-top: 8px;
+        }
+
+        .back-btn {
+            display: inline-block;
+            margin-top: 26px;
+            padding: 9px 16px;
+            font-size: 11px;
+            border-radius: 4px;
+            border: 1px solid #1f2937;
+            background: #020617;
             color: #e5e7eb;
             text-decoration: none;
             text-transform: uppercase;
-            letter-spacing: 1px;
+            letter-spacing: 2px;
+        }
+
+        .back-btn:hover {
+            border-color: #38bdf8;
+            box-shadow: 0 0 16px rgba(56,189,248,0.7);
+        }
+
+        /* Short intro */
+        .intro-overlay {
+            position: fixed;
+            inset: 0;
+            background: #000000;
+            z-index: 40;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            color: #e5e7eb;
+        }
+
+        .intro-line {
+            font-size: 12px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-bottom: 6px;
+            opacity: 0;
+            transform: translateY(4px);
+            animation: introLine 0.35s forwards;
+        }
+
+        @keyframes introLine {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .intro-overlay.hide {
+            animation: introFadeOut 0.6s ease-out forwards;
+            animation-delay: 1.4s;
+        }
+
+        @keyframes introFadeOut {
+            to {
+                opacity: 0;
+                visibility: hidden;
+            }
         }
     </style>
-
-    <script>
-        function toggleCategory(id) {
-            const section = document.getElementById(id);
-            section.style.display = section.style.display === "block" ? "none" : "block";
-        }
-    </script>
 </head>
+<body>
+    <div class="grid-bg"></div>
+    <div class="fog"></div>
+    <div class="particles"></div>
+    <div class="vhs-scanlines"></div>
 
-<body class="grid-bg">
+    <!-- Short VHS intro -->
+    <div class="intro-overlay" id="intro">
+        <div class="intro-line" style="animation-delay:0.1s;">LOADING MONSTER DATABASE...</div>
+        <div class="intro-line" style="animation-delay:0.5s;">HGH ENTITIES ONLINE.</div>
+    </div>
 
     <header>
         <div class="logo">HGH HUB</div>
@@ -138,34 +406,162 @@
         </nav>
     </header>
 
-    <main class="main">
-
+    <main>
         <div class="title">HGH MONSTERS</div>
         <div class="subtitle">CREATURES THAT HUNT IN THE DARK</div>
+        <div class="terminal-bar">MONSTER DATABASE / <span>HGH ENTITIES</span></div>
 
-        <div class="category" onclick="toggleCategory('forest')">FOREST MONSTERS</div>
-        <div class="monster-list" id="forest">
-            <div class="monster-card">
-                <div class="monster-name">FOREST MONSTER 1</div>
-                <div class="monster-desc">PLACEHOLDER</div>
-            </div>
-            <div class="monster-card">
-                <div class="monster-name">FOREST MONSTER 2</div>
-                <div class="monster-desc">PLACEHOLDER</div>
-            </div>
+        <div class="layout">
+            <!-- Left: categories + monsters -->
+            <section class="categories">
+                <div class="category" data-target="forest">
+                    <div class="category-label"><span>FOREST</span> MONSTERS</div>
+                    <div class="category-arrow">[ OPEN ]</div>
+                </div>
+                <div class="monster-list" id="forest">
+                    <div class="monster-card" data-name="THE WATCHER">
+                        <div class="monster-name"></div>
+                        <div class="monster-tagline">SILENT EYES BETWEEN THE TREES</div>
+                        <div class="monster-desc">
+                            A tall, emaciated figure that never moves while you look at it.  
+                            Turn away, and it shifts closer. The forest goes quiet when it’s near—  
+                            no wind, no birds, just your own breathing and the crunch of leaves.
+                        </div>
+                    </div>
+                    <div class="monster-card" data-name="BRANCH-CRAWLER">
+                        <div class="monster-name"></div>
+                        <div class="monster-tagline">ABOVE YOU, ALWAYS</div>
+                        <div class="monster-desc">
+                            It clings to the canopy, limbs bent wrong, crawling from branch to branch.  
+                            You never see it directly—only the movement of silhouettes and the sound  
+                            of bark cracking above your head.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="category" data-target="placeholder">
+                    <div class="category-label"><span>PLACEHOLDER</span> MONSTERS</div>
+                    <div class="category-arrow">[ OPEN ]</div>
+                </div>
+                <div class="monster-list" id="placeholder">
+                    <div class="monster-card" data-name="PLACEHOLDER ENTITY">
+                        <div class="monster-name"></div>
+                        <div class="monster-tagline">WAITING TO BE NAMED</div>
+                        <div class="monster-desc">
+                            A slot in the database reserved for something worse.  
+                            Its details are redacted, its audio logs corrupted,  
+                            and its footage permanently locked behind admin access.
+                        </div>
+                    </div>
+                </div>
+
+                <a class="back-btn" href="index.html">RETURN TO HUB</a>
+            </section>
+
+            <!-- Right: terminal box -->
+            <section class="terminal-box">
+                <div class="terminal-title">HGH MONSTER TERMINAL</div>
+                <div class="terminal-output" id="terminalOutput">
+                    [SYS] Monster database online.<br>
+                    [TIP] Click a category to expand entities.<br>
+                    [TIP] Type commands like <span style="color:#38bdf8;">forest</span> or <span style="color:#38bdf8;">placeholder</span>.
+                </div>
+                <div class="terminal-input">
+                    <div class="terminal-prefix">HGH&gt;</div>
+                    <input class="terminal-field" id="terminalField" placeholder="enter command (forest / placeholder / help)">
+                </div>
+                <div class="terminal-hint">
+                    Commands: <span style="color:#38bdf8;">forest</span>, <span style="color:#38bdf8;">placeholder</span>, <span style="color:#38bdf8;">help</span>, <span style="color:#38bdf8;">clear</span>.
+                </div>
+            </section>
         </div>
-
-        <div class="category" onclick="toggleCategory('p1')">PLACEHOLDER MONSTERS</div>
-        <div class="monster-list" id="p1">
-            <div class="monster-card">
-                <div class="monster-name">PLACEHOLDER MONSTER</div>
-                <div class="monster-desc">PLACEHOLDER</div>
-            </div>
-        </div>
-
-        <a class="back-btn" href="index.html">RETURN TO HUB</a>
-
     </main>
 
+    <script>
+        // Short intro hide
+        const introEl = document.getElementById("intro");
+        window.addEventListener("load", () => {
+            introEl.classList.add("hide");
+            setTimeout(() => { introEl.style.display = "none"; }, 2000);
+        });
+
+        // Hover sound (same tiny beep as index)
+        let hoverAudio;
+        try {
+            hoverAudio = new Audio("data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAESsAACJWAAACABAAZGF0YQAAAAA=");
+        } catch (e) {}
+
+        document.querySelectorAll(".category").forEach(cat => {
+            cat.addEventListener("mouseenter", () => {
+                if (hoverAudio) {
+                    hoverAudio.currentTime = 0;
+                    hoverAudio.play().catch(() => {});
+                }
+            });
+        });
+
+        // Category toggle
+        const categories = document.querySelectorAll(".category");
+        categories.forEach(cat => {
+            cat.addEventListener("click", () => {
+                const targetId = cat.getAttribute("data-target");
+                const list = document.getElementById(targetId);
+                const arrow = cat.querySelector(".category-arrow");
+                const isOpen = list.style.display === "block";
+                list.style.display = isOpen ? "none" : "block";
+                arrow.textContent = isOpen ? "[ OPEN ]" : "[ CLOSE ]";
+                logToTerminal(isOpen ? `Closed ${targetId} entities.` : `Opened ${targetId} entities.`);
+            });
+        });
+
+        // Typing animation for monster names
+        const monsterCards = document.querySelectorAll(".monster-card");
+        monsterCards.forEach(card => {
+            const name = card.getAttribute("data-name");
+            const nameEl = card.querySelector(".monster-name");
+            let i = 0;
+            const delay = 60;
+            setTimeout(() => {
+                const interval = setInterval(() => {
+                    nameEl.textContent = name.slice(0, i);
+                    i++;
+                    if (i > name.length) clearInterval(interval);
+                }, delay);
+            }, 400);
+        });
+
+        // Terminal command system
+        const terminalOutput = document.getElementById("terminalOutput");
+        const terminalField = document.getElementById("terminalField");
+
+        function logToTerminal(msg) {
+            terminalOutput.innerHTML += "<br>" + msg;
+            terminalOutput.scrollTop = terminalOutput.scrollHeight;
+        }
+
+        terminalField.addEventListener("keydown", e => {
+            if (e.key === "Enter") {
+                const cmd = terminalField.value.trim().toLowerCase();
+                terminalField.value = "";
+                if (!cmd) return;
+
+                logToTerminal("HGH> " + cmd);
+
+                if (cmd === "help") {
+                    logToTerminal("[HELP] forest, placeholder, clear.");
+                } else if (cmd === "clear") {
+                    terminalOutput.innerHTML = "[SYS] Output cleared.";
+                } else if (cmd === "forest") {
+                    document.getElementById("forest").style.display = "block";
+                    logToTerminal("[SYS] Forest entities expanded.");
+                } else if (cmd === "placeholder") {
+                    document.getElementById("placeholder").style.display = "block";
+                    logToTerminal("[SYS] Placeholder entities expanded.");
+                } else {
+                    logToTerminal("[ERR] Unknown command.");
+                }
+            }
+        });
+    </script>
 </body>
 </html>
