@@ -8,13 +8,16 @@
             font-family: Consolas, monospace;
             background: #05060a;
             color: #f5f5f5;
+            /* glitch + static transition */
             opacity: 0;
             animation: pageFade 1.5s forwards;
         }
 
         @keyframes pageFade {
-            from { opacity: 0; }
-            to { opacity: 1; }
+            0% { opacity: 0; filter: contrast(200%) saturate(0) blur(3px); }
+            40% { opacity: 0.4; filter: contrast(150%) saturate(50%) blur(2px); }
+            70% { opacity: 0.8; filter: contrast(120%) saturate(80%) blur(1px); }
+            100% { opacity: 1; filter: none; }
         }
 
         .grid-bg {
@@ -22,6 +25,12 @@
                 linear-gradient(#111 1px, transparent 1px),
                 linear-gradient(90deg, #111 1px, transparent 1px);
             background-size: 40px 40px;
+            animation: gridMove 20s linear infinite;
+        }
+
+        @keyframes gridMove {
+            from { background-position: 0 0, 0 0; }
+            to { background-position: 80px 80px, 80px 80px; }
         }
 
         header {
@@ -30,6 +39,8 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
+            position: relative;
+            z-index: 2;
         }
 
         .logo {
@@ -48,12 +59,13 @@
 
         nav a:hover {
             color: #00c8ff;
-            letter-spacing: 2px;
-            text-shadow: 0 0 8px #00c8ff;
+            text-shadow: 0 0 10px #00c8ff;
         }
 
         .main {
             padding: 40px 32px 60px;
+            position: relative;
+            z-index: 2;
         }
 
         .title {
@@ -71,11 +83,34 @@
             margin-bottom: 16px;
         }
 
+        .category {
+            background: #0b0d13;
+            border: 1px solid #1f2937;
+            padding: 16px;
+            margin-bottom: 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: 0.3s;
+            font-size: 18px;
+            letter-spacing: 2px;
+        }
+
+        .category:hover {
+            border-color: #00c8ff;
+            box-shadow: 0 0 12px #00c8ff;
+            transform: scale(1.02);
+        }
+
+        .monster-list {
+            display: none;
+            margin-top: 12px;
+        }
+
         .monster-card {
             background: #0b0d13;
             border: 1px solid #1f2937;
             padding: 20px;
-            margin-bottom: 24px;
+            margin-bottom: 16px;
             border-radius: 6px;
             max-width: 600px;
             transition: 0.3s;
@@ -87,7 +122,6 @@
             transform: scale(1.02);
         }
 
-        /* TYPING ANIMATION FOR MONSTER NAMES */
         .monster-name {
             font-size: 20px;
             font-weight: 700;
@@ -138,7 +172,7 @@
             color: #a8f0ff;
         }
 
-        /* HORROR INTRO SCREEN */
+        /* VHS + terminal boot intro */
         #intro {
             position: fixed;
             top: 0;
@@ -150,23 +184,244 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            font-size: 32px;
-            letter-spacing: 4px;
+            flex-direction: column;
+            font-size: 20px;
+            letter-spacing: 3px;
             z-index: 999;
-            animation: introFade 3s forwards;
+            overflow: hidden;
         }
 
-        @keyframes introFade {
-            0% { opacity: 1; }
-            70% { opacity: 1; }
-            100% { opacity: 0; visibility: hidden; }
+        #intro-text {
+            font-family: Consolas, monospace;
+        }
+
+        .vhs-lines {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            background-image: linear-gradient(rgba(255,255,255,0.05) 1px, transparent 1px);
+            background-size: 100% 4px;
+            mix-blend-mode: screen;
+            opacity: 0.3;
+            animation: vhsMove 2s linear infinite;
+        }
+
+        @keyframes vhsMove {
+            from { background-position-y: 0; }
+            to { background-position-y: 8px; }
+        }
+
+        /* particles + fog */
+        .particles {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 50%;
+            animation: float 10s linear infinite;
+        }
+
+        @keyframes float {
+            from { transform: translateY(0); opacity: 0.2; }
+            to { transform: translateY(-200px); opacity: 0; }
+        }
+
+        .fog {
+            position: fixed;
+            inset: 0;
+            background: radial-gradient(circle at 20% 80%, rgba(255,255,255,0.05), transparent 60%),
+                        radial-gradient(circle at 80% 20%, rgba(255,255,255,0.05), transparent 60%);
+            mix-blend-mode: screen;
+            opacity: 0.3;
+            animation: fogDrift 30s linear infinite;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        @keyframes fogDrift {
+            from { transform: translateX(0); }
+            to { transform: translateX(60px); }
+        }
+
+        /* static burst overlay */
+        .static-burst {
+            position: fixed;
+            inset: 0;
+            background: repeating-linear-gradient(
+                0deg,
+                rgba(255,255,255,0.1),
+                rgba(255,255,255,0.1) 1px,
+                transparent 2px,
+                transparent 3px
+            );
+            mix-blend-mode: screen;
+            opacity: 0;
+            pointer-events: none;
+            z-index: 3;
+            animation: staticBurst 1s ease-out;
+        }
+
+        @keyframes staticBurst {
+            0% { opacity: 0.6; }
+            50% { opacity: 0.3; }
+            100% { opacity: 0; }
+        }
+
+        /* terminal box */
+        .terminal {
+            margin-top: 32px;
+            background: #05060a;
+            border: 1px solid #1f2937;
+            padding: 16px;
+            border-radius: 6px;
+            max-width: 600px;
+        }
+
+        .terminal-title {
+            font-size: 14px;
+            color: #9ca3af;
+            margin-bottom: 8px;
+        }
+
+        .terminal-output {
+            font-size: 13px;
+            color: #e5e7eb;
+            min-height: 60px;
+            margin-bottom: 8px;
+            white-space: pre-line;
+        }
+
+        .terminal-input {
+            width: 100%;
+            padding: 8px;
+            background: #020617;
+            border: 1px solid #1f2937;
+            color: #e5e7eb;
+            font-family: Consolas, monospace;
+            font-size: 13px;
+        }
+
+        .terminal-input:focus {
+            outline: none;
+            border-color: #00c8ff;
+            box-shadow: 0 0 8px #00c8ff;
         }
     </style>
+
+    <script>
+        // VHS + terminal boot intro typing
+        document.addEventListener("DOMContentLoaded", () => {
+            const introText = document.getElementById("intro-text");
+            const intro = document.getElementById("intro");
+            const staticBurst = document.querySelector(".static-burst");
+            const sequence = [
+                "BOOTING HGH MONSTERS SYSTEM...",
+                "LOADING VHS MODULE...",
+                "INITIALIZING TERMINAL INTERFACE...",
+                "READY."
+            ];
+            let idx = 0;
+
+            function typeLine() {
+                if (idx >= sequence.length) {
+                    setTimeout(() => {
+                        intro.style.display = "none";
+                        staticBurst.style.display = "none";
+                    }, 800);
+                    return;
+                }
+                introText.textContent = sequence[idx];
+                idx++;
+                setTimeout(typeLine, 900);
+            }
+
+            typeLine();
+
+            // hover sound
+            const hoverSound = document.getElementById("hover-sound");
+            document.querySelectorAll("a, .category, .back-btn").forEach(el => {
+                el.addEventListener("mouseenter", () => {
+                    hoverSound.currentTime = 0;
+                    hoverSound.play().catch(() => {});
+                });
+            });
+        });
+
+        // category toggle
+        function toggleCategory(id) {
+            const section = document.getElementById(id);
+            section.style.display = section.style.display === "block" ? "none" : "block";
+        }
+
+        // terminal commands
+        function handleCommand(e) {
+            if (e.key === "Enter") {
+                const input = e.target;
+                const output = document.getElementById("terminal-output");
+                const cmd = input.value.trim().toLowerCase();
+
+                if (!cmd) return;
+
+                if (cmd === "help") {
+                    output.textContent =
+                        "AVAILABLE COMMANDS:\n" +
+                        "help - show commands\n" +
+                        "show forest - open Forest Monsters\n" +
+                        "show placeholders - open all Placeholder categories\n" +
+                        "clear - clear output";
+                } else if (cmd === "show forest") {
+                    toggleCategory('forest');
+                    output.textContent = "OPENED: FOREST MONSTERS";
+                } else if (cmd === "show placeholders") {
+                    ['p1','p2','p3','p4','p5'].forEach(id => toggleCategory(id));
+                    output.textContent = "OPENED: ALL PLACEHOLDER MONSTER CATEGORIES";
+                } else if (cmd === "clear") {
+                    output.textContent = "";
+                } else {
+                    output.textContent = "UNKNOWN COMMAND: " + cmd + "\nType 'help' for options.";
+                }
+
+                input.value = "";
+            }
+        }
+    </script>
 </head>
 
 <body class="grid-bg">
 
-    <div id="intro">HGH MONSTERS LOADING...</div>
+    <!-- VHS + terminal boot intro -->
+    <div id="intro">
+        <div class="vhs-lines"></div>
+        <div id="intro-text">BOOTING...</div>
+    </div>
+
+    <!-- static burst overlay -->
+    <div class="static-burst"></div>
+
+    <!-- animated background: particles + fog -->
+    <div class="particles">
+        <div class="particle" style="left:10%; bottom:0; animation-delay:0s;"></div>
+        <div class="particle" style="left:30%; bottom:-40px; animation-delay:2s;"></div>
+        <div class="particle" style="left:50%; bottom:-80px; animation-delay:4s;"></div>
+        <div class="particle" style="left:70%; bottom:-60px; animation-delay:1s;"></div>
+        <div class="particle" style="left:85%; bottom:-100px; animation-delay:3s;"></div>
+    </div>
+    <div class="fog"></div>
+
+    <!-- hover sound -->
+    <audio id="hover-sound">
+        <source src="https://actions.google.com/sounds/v1/foley/cloth_swipe.ogg" type="audio/ogg">
+    </audio>
 
     <header>
         <div class="logo">HGH HUB</div>
@@ -186,36 +441,78 @@
         <div class="title">HGH MONSTERS</div>
         <div class="subtitle">CREATURES THAT HUNT IN THE DARK</div>
 
-        <!-- FOREST MONSTERS -->
-        <div class="monster-card">
-            <div class="monster-name">FOREST MONSTERS</div>
-            <div class="monster-desc">PLACEHOLDER</div>
+        <!-- CATEGORY 1: FOREST MONSTERS -->
+        <div class="category" onclick="toggleCategory('forest')">FOREST MONSTERS</div>
+        <div class="monster-list" id="forest">
+            <div class="monster-card">
+                <div class="monster-name">FOREST MONSTER 1</div>
+                <div class="monster-desc">PLACEHOLDER</div>
+            </div>
+            <div class="monster-card">
+                <div class="monster-name">FOREST MONSTER 2</div>
+                <div class="monster-desc">PLACEHOLDER</div>
+            </div>
+            <div class="monster-card">
+                <div class="monster-name">FOREST MONSTER 3</div>
+                <div class="monster-desc">PLACEHOLDER</div>
+            </div>
         </div>
 
-        <!-- PLACEHOLDER MONSTERS -->
-        <div class="monster-card">
-            <div class="monster-name">PLACEHOLDER MONSTER</div>
-            <div class="monster-desc">PLACEHOLDER</div>
+        <!-- CATEGORY 2 -->
+        <div class="category" onclick="toggleCategory('p1')">PLACEHOLDER MONSTERS</div>
+        <div class="monster-list" id="p1">
+            <div class="monster-card">
+                <div class="monster-name">PLACEHOLDER MONSTER</div>
+                <div class="monster-desc">PLACEHOLDER</div>
+            </div>
         </div>
 
-        <div class="monster-card">
-            <div class="monster-name">PLACEHOLDER MONSTER</div>
-            <div class="monster-desc">PLACEHOLDER</div>
+        <!-- CATEGORY 3 -->
+        <div class="category" onclick="toggleCategory('p2')">PLACEHOLDER MONSTERS</div>
+        <div class="monster-list" id="p2">
+            <div class="monster-card">
+                <div class="monster-name">PLACEHOLDER MONSTER</div>
+                <div class="monster-desc">PLACEHOLDER</div>
+            </div>
         </div>
 
-        <div class="monster-card">
-            <div class="monster-name">PLACEHOLDER MONSTER</div>
-            <div class="monster-desc">PLACEHOLDER</div>
+        <!-- CATEGORY 4 -->
+        <div class="category" onclick="toggleCategory('p3')">PLACEHOLDER MONSTERS</div>
+        <div class="monster-list" id="p3">
+            <div class="monster-card">
+                <div class="monster-name">PLACEHOLDER MONSTER</div>
+                <div class="monster-desc">PLACEHOLDER</div>
+            </div>
         </div>
 
-        <div class="monster-card">
-            <div class="monster-name">PLACEHOLDER MONSTER</div>
-            <div class="monster-desc">PLACEHOLDER</div>
+        <!-- CATEGORY 5 -->
+        <div class="category" onclick="toggleCategory('p4')">PLACEHOLDER MONSTERS</div>
+        <div class="monster-list" id="p4">
+            <div class="monster-card">
+                <div class="monster-name">PLACEHOLDER MONSTER</div>
+                <div class="monster-desc">PLACEHOLDER</div>
+            </div>
         </div>
 
-        <div class="monster-card">
-            <div class="monster-name">PLACEHOLDER MONSTER</div>
-            <div class="monster-desc">PLACEHOLDER</div>
+        <!-- CATEGORY 6 -->
+        <div class="category" onclick="toggleCategory('p5')">PLACEHOLDER MONSTERS</div>
+        <div class="monster-list" id="p5">
+            <div class="monster-card">
+                <div class="monster-name">PLACEHOLDER MONSTER</div>
+                <div class="monster-desc">PLACEHOLDER</div>
+            </div>
+        </div>
+
+        <!-- TERMINAL COMMAND BOX -->
+        <div class="terminal">
+            <div class="terminal-title">HGH TERMINAL — TYPE COMMANDS (try: help)</div>
+            <div class="terminal-output" id="terminal-output"></div>
+            <input
+                class="terminal-input"
+                id="terminal-input"
+                placeholder="HGH > type command here..."
+                onkeydown="handleCommand(event)"
+            />
         </div>
 
         <a class="back-btn" href="index.html">RETURN TO HUB</a>
